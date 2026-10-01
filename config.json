@@ -1,0 +1,20 @@
+{
+  "parkingRates": {
+    "hourly": 50,
+    "daily": 400,
+    "monthly": 8000
+  },
+  "bookingSettings": {
+    "maxAdvanceBookingDays": 30,
+    "cancellationWindow": 2,
+    "gracePeriod": 15
+  },
+  "cameraSettings": {
+    "captureInterval": 5,
+    "confidenceThreshold": 0.7
+  },
+  "socketSettings": {
+    "reconnectionAttempts": 5,
+    "timeout": 10000
+  }
+}

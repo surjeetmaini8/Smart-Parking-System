@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Parking System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Leaflet.js for Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body class="light-mode">
+    <!-- Top Navbar -->
+    <nav class="top-navbar">
+        <div class="navbar-left">
+            <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebarToggleBtn" style="display: none;">☰</button>
+            <h1 class="logo">SmartParking Reservation🅿️</h1>
+        </div>
+        <div class="navbar-right">
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                <span class="theme-icon">🌙</span>
+            </button>
+            <div class="user-profile" id="userProfileBtn" style="display: none;">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23667eea'/%3E%3Ctext x='20' y='26' font-size='18' fill='white' text-anchor='middle' font-family='Arial'%3EU%3C/text%3E%3C/svg%3E" alt="Avatar" class="avatar">
+                <span class="user-name" id="navUserName">User</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar Menu -->
+    <aside class="sidebar" id="userSidebar" style="display: none;">
+        <div class="sidebar-section">
+            <h4>Menu</h4>
+            <a href="#" onclick="showSection('dashboard')" class="sidebar-link active">
+                <span class="icon">📊</span> Dashboard
+            </a>
+            <a href="#" onclick="showSection('parking')" class="sidebar-link">
+                <span class="icon">🅿️</span> Find Parking
+            </a>
+            <a href="#" onclick="showSection('map')" class="sidebar-link">
+                <span class="icon">📍</span> Map View
+            </a>
+        </div>
+        <div class="sidebar-section">
+            <h4>My Account</h4>
+            <a href="#" onclick="showSection('bookings')" class="sidebar-link">
+                <span class="icon">📘</span> My Bookings
+            </a>
+            <a href="#" onclick="showSection('vehicles')" class="sidebar-link">
+                <span class="icon">🚗</span> My Vehicles
+            </a>
+            <a href="#" onclick="showSection('profile')" class="sidebar-link">
+                <span class="icon">👤</span> Profile
+            </a>
+        </div>
+        <div class="sidebar-footer">
+            <button onclick="logout()" class="btn-logout">🚪 Logout</button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content" id="mainContent">
+        <!-- Login Section -->
+        <div id="loginSection" class="section">
+            <div class="auth-card">
+                <h2>Welcome Back</h2>
+                <p class="auth-subtitle">Sign in to manage your parking</p>
+                <form onsubmit="login(event)">
+                    <div class="input-group">
+                        <label for="loginEmail">Email Address</label>
+                        <input type="email" id="loginEmail" placeholder="your@email.com" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                    </div>
+                    <div class="forgot-password">
+                        <a href="#" onclick="showForgotPassword(event)">Forgot Password?</a>
+                    </div>
+                    <button type="submit" class="btn-primary">Sign In</button>
+                </form>
+                <p>Don't have an account? <a href="#" onclick="showSection('register')">Create Account</a></p>
+            </div>
+        </div>
+
+        <!-- Forgot Password Section -->
+        <div id="forgotPasswordSection" class="section" style="display: none;">
+            <div class="auth-card">
+                <h2>Reset Password</h2>
+                <p class="auth-subtitle">Enter your email to receive reset instructions</p>
+                <form onsubmit="resetPassword(event)">
+                    <div class="input-group">
+                        <label for="resetEmail">Email Address</label>
+                        <input type="email" id="resetEmail" placeholder="your@email.com" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Send Reset Link</button>
+                    <button type="button" onclick="showSection('login')" class="btn-secondary" style="margin-top: 10px;">Back to Login</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Register Section -->
+        <div id="registerSection" class="section" style="display: none;">
+            <div class="auth-card">
+                <h2>Create Account</h2>
+                <p class="auth-subtitle">Join us to start parking smarter</p>
+                <form onsubmit="register(event)">
+                    <div class="input-group">
+                        <label for="regName">Full Name</label>
+                        <input type="text" id="regName" placeholder="John Doe" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="regEmail">Email Address</label>
+                        <input type="email" id="regEmail" placeholder="your@email.com" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="regPhone">Phone Number</label>
+                        <input type="tel" id="regPhone" placeholder="+1234567890" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="regPassword">Password</label>
+                        <input type="password" id="regPassword" placeholder="Create a strong password" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Create Account</button>
+                </form>
+                <p>Already have an account? <a href="#" onclick="showSection('login')">Sign In</a></p>
+            </div>
+        </div>
+
+        <!-- User Dashboard Section -->
+        <div id="dashboardSection" class="section" style="display: none;">
+            <div class="dashboard-header">
+                <h2>Welcome back, <span id="userName">User</span>! 👋</h2>
+                <p class="dashboard-subtitle">Here's your parking overview</p>
+            </div>
+
+            <!-- Dashboard Stats -->
+            <div class="user-stats-grid">
+                <div class="user-stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">📘</div>
+                    <div class="stat-content">
+                        <h3 id="userActiveBookings">0</h3>
+                        <p>Active Bookings</p>
+                    </div>
+                </div>
+                <div class="user-stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c);">🚗</div>
+                    <div class="stat-content">
+                        <h3 id="userTotalVehicles">0</h3>
+                        <p>My Vehicles</p>
+                    </div>
+                </div>
+                <div class="user-stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">💰</div>
+                    <div class="stat-content">
+                        <h3 id="userWalletBalance">₹0</h3>
+                        <p>Wallet Balance</p>
+                    </div>
+                </div>
+                <div class="user-stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">✅</div>
+                    <div class="stat-content">
+                        <h3 id="userCompletedBookings">0</h3>
+                        <p>Completed Trips</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <h3>⚡ Quick Actions</h3>
+                <div class="action-buttons">
+                    <button onclick="showSection('parking')" class="action-btn">
+                        <span class="action-icon">🅿️</span>
+                        <span>Find Parking</span>
+                    </button>
+                    <button onclick="showSection('bookings')" class="action-btn">
+                        <span class="action-icon">📝</span>
+                        <span>View Bookings</span>
+                    </button>
+                    <button onclick="showSection('vehicles')" class="action-btn">
+                        <span class="action-icon">🚙</span>
+                        <span>Manage Vehicles</span>
+                    </button>
+                    <button onclick="showSection('profile')" class="action-btn">
+                        <span class="action-icon">👤</span>
+                        <span>My Profile</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Recent Bookings -->
+            <div class="recent-section">
+                <div class="section-header">
+                    <h3>📌 Recent Bookings</h3>
+                    <a href="#" onclick="showSection('bookings')" class="view-all">View All →</a>
+                </div>
+                <div id="recentBookings" class="recent-bookings-list"></div>
+            </div>
+
+            <!-- Spending Summary -->
+            <div class="spending-summary">
+                <h3>📈 Your Parking Activity</h3>
+                <div class="summary-cards">
+                    <div class="summary-card">
+                        <p class="summary-label">This Month</p>
+                        <h4 id="thisMonthSpending">₹0</h4>
+                        <span class="summary-detail" id="thisMonthBookings">0 bookings</span>
+                    </div>
+                    <div class="summary-card">
+                        <p class="summary-label">Total Spent</p>
+                        <h4 id="totalSpending">₹0</h4>
+                        <span class="summary-detail" id="totalBookingsCount">0 bookings</span>
+                    </div>
+                    <div class="summary-card">
+                        <p class="summary-label">Avg. Per Booking</p>
+                        <h4 id="avgSpending">₹0</h4>
+                        <span class="summary-detail">Average cost</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Parking Locations Section -->
+        <div id="parkingSection" class="section" style="display: none;">
+            <h2 style="margin: 0 0 1.5rem 0; color: #667eea; font-size: 1.8rem;">📍 Available Parking Locations</h2>
+            <div class="search-bar">
+                <input type="text" id="searchLocation" placeholder="Search by location name...">
+                <button onclick="searchParkingLocations()" class="btn-primary">Search</button>
+            </div>
+            <div id="parkingList" class="parking-grid"></div>
+        </div>
+
+        <!-- Booking Modal -->
+        <div id="bookingModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeBookingModal()">&times;</span>
+                <h2>Book Parking Slot</h2>
+                <div id="bookingForm">
+                    <div class="form-group">
+                        <label>Location:</label>
+                        <p id="bookLocationName"></p>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Vehicle:</label>
+                        <select id="bookVehicle" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Slot:</label>
+                        <select id="bookSlot" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Start Time:</label>
+                        <input type="datetime-local" id="bookStartTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label>End Time:</label>
+                        <input type="datetime-local" id="bookEndTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Estimated Cost:</label>
+                        <p id="estimatedCost" style="font-size: 1.5em; font-weight: bold; color: #2563eb;">₹0.00</p>
+                    </div>
+                    <div class="form-group">
+                        <label>Payment Method:</label>
+                        <select id="paymentMethod" required>
+                            <option value="">Select Payment Method</option>
+                            <option value="wallet">Wallet</option>
+                            <option value="card">Credit/Debit Card</option>
+                            <option value="upi">UPI</option>
+                            <option value="cash">Cash on Arrival</option>
+                        </select>
+                    </div>
+                    <button onclick="createBooking()" class="btn-primary">Confirm Booking & Pay</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Bookings Section -->
+        <div id="bookingsSection" class="section" style="display: none;">
+            <h2>My Bookings</h2>
+            <div class="filter-bar">
+                <select id="bookingFilter" onchange="loadMyBookings()">
+                    <option value="">All Bookings</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="active">Active</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+            </div>
+            <div id="bookingsList"></div>
+        </div>
+
+        <!-- My Vehicles Section -->
+        <div id="vehiclesSection" class="section" style="display: none;">
+            <h2>My Vehicles</h2>
+            <button onclick="showAddVehicleForm()" class="btn-primary">Add Vehicle</button>
+            <div id="vehiclesList"></div>
+            
+            <div id="addVehicleForm" style="display: none; margin-top: 20px;">
+                <h3>Add New Vehicle</h3>
+                <form onsubmit="addVehicle(event)">
+                    <input type="text" id="vehiclePlate" placeholder="License Plate" required>
+                    <input type="text" id="vehicleMake" placeholder="Make (e.g., Toyota)" required>
+                    <input type="text" id="vehicleModel" placeholder="Model (e.g., Camry)" required>
+                    <input type="text" id="vehicleColor" placeholder="Color" required>
+                    <select id="vehicleType" required>
+                        <option value="car">Car</option>
+                        <option value="bike">Bike</option>
+                        <option value="suv">SUV</option>
+                        <option value="truck">Truck</option>
+                    </select>
+                    <label>
+                        <input type="checkbox" id="vehiclePrimary"> Set as primary vehicle
+                    </label>
+                    <button type="submit" class="btn-primary">Add Vehicle</button>
+                    <button type="button" onclick="hideAddVehicleForm()" class="btn-secondary">Cancel</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Profile Section -->
+        <div id="profileSection" class="section" style="display: none;">
+            <h2>My Profile</h2>
+            <div id="profileInfo"></div>
+            
+            <div style="margin-top: 30px; padding: 20px; border: 2px solid #2563eb; border-radius: 8px; background: #f0f9ff;">
+                <h3>💰 Wallet Management</h3>
+                <div style="margin: 20px 0;">
+                    <p>Current Balance: <strong id="walletBalance" style="font-size: 1.5em; color: #2563eb;">₹0.00</strong></p>
+                </div>
+                <div>
+                    <input type="number" id="addFundsAmount" placeholder="Amount to add" min="1" step="0.01" style="padding: 10px; width: 200px; margin-right: 10px;">
+                    <button onclick="addFundsToWallet()" class="btn-primary">Add Funds</button>
+                </div>
+                <p style="margin-top: 10px; font-size: 0.9em; color: #666;">Tip: Keep your wallet topped up for instant bookings!</p>
+            </div>
+        </div>
+
+        <!-- Map View Section -->
+        <div id="mapSection" class="section" style="display: none;">
+            <h2>📍 Parking Locations Map</h2>
+            <div class="map-filters">
+                <input type="text" id="userMapSearch" placeholder="Search locations..." oninput="filterUserMapLocations()">
+                <select id="userMapSlotFilter" onchange="filterUserMapLocations()">
+                    <option value="">All Availability</option>
+                    <option value="available">Available</option>
+                    <option value="limited">Limited</option>
+                    <option value="full">Full</option>
+                </select>
+                <select id="userMapPriceFilter" onchange="filterUserMapLocations()">
+                    <option value="">All Prices</option>
+                    <option value="low">Low (₹0-50/hr)</option>
+                    <option value="medium">Medium (₹50-100/hr)</option>
+                    <option value="high">High (₹100+/hr)</option>
+                </select>
+            </div>
+            <div id="userParkingMap" style="height: 600px; border-radius: 8px; margin-top: 20px; border: 2px solid var(--border-color, #e2e8f0);"></div>
+        </div>
+    </main>
+
+    <div id="notification" class="notification"></div>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

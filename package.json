@@ -1,0 +1,38 @@
+{
+  "name": "smart-parking-system",
+  "version": "1.0.0",
+  "description": "Web-based smart parking system with real-time availability, online booking, and ALPR",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js",
+    "test": "node --test tests/security.test.js"
+  },
+  "keywords": [
+    "parking",
+    "iot",
+    "alpr",
+    "booking",
+    "real-time"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.4.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "form-data": "^4.0.4",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "pg": "^8.11.0",
+    "razorpay": "^2.9.6",
+    "socket.io": "^4.6.1",
+    "twilio": "^5.10.4",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}

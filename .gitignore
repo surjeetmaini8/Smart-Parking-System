@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+
+# Environment variables
+.env
+**/.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Database
+*.db
+*.sqlite
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads
+uploads/
+captured_images/
+
+# Build
+dist/
+build/
+
+# MATLAB
+*.asv
+*.m~
