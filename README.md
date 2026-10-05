@@ -215,10 +215,6 @@ Security considerations implemented in the project include:
 
 * SMS API integration
 
-## Testing
-
-* Node.js testing tools
-* Security and authentication tests
 
 ---
 
