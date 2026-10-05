@@ -28,7 +28,7 @@ The system is designed to automate the parking workflow from vehicle identificat
 * Parking occupancy tracking
 * Prevention of conflicting reservations
 
-### 📷 Automatic License Plate Recognition
+###  Automatic License Plate Recognition
 
 The system integrates camera-based vehicle detection with an OCR/ALPR pipeline.
 
